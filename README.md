@@ -1,6 +1,6 @@
 # telegram-group-moderator-bot
 [![CircleCI](https://circleci.com/gh/fernnetwork/telegram-group-moderator-bot.svg?style=shield)](https://circleci.com/gh/fernnetwork/telegram-group-moderator-bot)
-[![Coverage](https://s3-eu-west-1.amazonaws.com/ab-ci-reports/telegram-group-moderator-bot/develop/badge.svg)](https://s3-eu-west-1.amazonaws.com/ab-ci-reports/telegram-group-moderator-bot/master/lcov-report/index.html)
+[![Coverage](https://s3-eu-west-1.amazonaws.com/ab-ci-reports/telegram-group-moderator-bot/master/badge.svg)](https://s3-eu-west-1.amazonaws.com/ab-ci-reports/telegram-group-moderator-bot/master/lcov-report/index.html)
 
 Telegram group moderator bot for protecting a telegram group from scams.
 
