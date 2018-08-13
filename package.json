@@ -29,7 +29,7 @@
     "jest-html-reporter": "^2.4.2",
     "jest-junit": "^5.0.0",
     "make-coverage-badge": "^1.0.1",
-    "serverless": "^1.27.3",
+    "serverless": "^1.30.0",
     "serverless-offline": "^3.25.4"
   },
   "eslintConfig": {
