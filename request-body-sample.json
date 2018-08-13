@@ -1,0 +1,21 @@
+{
+  "update_id": 836045347,
+  "message": {
+    "message_id": 5,
+    "from": {
+      "id": 615554824,
+      "is_bot": false,
+      "first_name": "Jimmy",
+      "last_name": "Chen",
+      "username": "my_user_name",
+      "language_code": "en-GB"
+    },
+    "chat": {
+      "id": -1001194579487,
+      "title": "My Telegram Group",
+      "type": "supergroup"
+    },
+    "date": 1533896450,
+    "text": "Hello World!"
+  }
+}

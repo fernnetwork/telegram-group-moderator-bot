@@ -1,0 +1,126 @@
+version: 2
+
+references:
+  defaults: &defaults
+    working_directory: ~/workspace
+    docker:
+      - image: circleci/node:9
+
+  install_serverless: &install_serverless
+    run:
+      name: Install Serverless CLI
+      command: sudo npm i --unsafe-perm -g serverless
+
+  set_aws_credentials: &set_aws_credentials
+    run:
+      name: Set AWS credentials
+      command: |
+        mkdir ~/.aws
+        echo -e "[default]\naws_access_key_id=${DEV_AWS_ACCESS_KEY_ID}\naws_secret_access_key=${DEV_AWS_SECRET_ACCESS_KEY}\n" > ~/.aws/credentials
+
+jobs:
+  setup:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Set NPM token
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+      - restore_cache:
+          key: npm-v1-{{ checksum "package.json" }}
+      - run: npm install
+      - save_cache:
+          key: npm-v1-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - save_cache:
+          key: repo-v1-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/workspace
+
+  test:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: repo-v1-{{ .Environment.CIRCLE_SHA1 }}
+      - run:
+          environment:
+            JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
+          command: npm run test:ci
+      - run:
+          name: Publish coverage result to S3
+          command: |
+            npm run make-coverage-badge
+            sudo npm i --unsafe-perm -g s3-cli
+            echo -e "[default]\naccess_key = ${DEV_AWS_ACCESS_KEY_ID}\nsecret_key = ${DEV_AWS_SECRET_ACCESS_KEY}\n" > ~/.s3cfg
+            s3-cli sync --delete-removed coverage s3://ab-ci-reports/${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}
+      - store_test_results:
+          path: reports/junit
+      - store_artifacts:
+          path: reports/junit
+      - store_artifacts:
+          path: coverage
+
+  lint:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: repo-v1-{{ .Environment.CIRCLE_SHA1 }}
+      - run:
+          environment:
+            ESLINT_REPORTS_DIR: reports/junit
+          command: npm run lint:ci
+      - store_test_results:
+          path: reports/junit
+      - store_artifacts:
+          path: reports/junit
+
+  deploy-dev:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: repo-v1-{{ .Environment.CIRCLE_SHA1 }}
+      - *install_serverless
+      - *set_aws_credentials
+      - run:
+          name: Deploy application
+          command: sls deploy --stage dev
+
+  deploy-prod:
+    <<: *defaults
+    steps:
+      - restore_cache:
+          key: repo-v1-{{ .Environment.CIRCLE_SHA1 }}
+      - *install_serverless
+      - *set_aws_credentials
+      - run:
+          name: Deploy application
+          command: sls deploy --stage prod
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - setup
+      - test:
+          requires:
+            - setup
+      - lint:
+          requires:
+            - setup
+      - deploy-dev:
+          requires:
+            - test
+            - lint
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: master
+      - deployment-approval:
+          type: approval
+          requires:
+            - deploy-dev
+      - deploy-prod:
+          requires:
+            - deployment-approval

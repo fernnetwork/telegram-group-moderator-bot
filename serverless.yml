@@ -1,0 +1,31 @@
+service: telegram-group-moderator-bot
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  region: eu-west-1
+  stage: dev
+  runtime: nodejs8.10
+  memorySize: 128
+  environment: ${file(env.yml):${self:custom.stage}, file(env.yml):default}
+
+functions:
+  webhook:
+    handler: webhook.handler
+    events:
+      - http:
+          path: /webhook/{token}
+          method: post
+
+plugins:
+  - serverless-offline
+
+package:
+  exclude:
+    - .circlci
+    - .git/**
+    - env.yml
+    - coverage/**
+    - reports/**

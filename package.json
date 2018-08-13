@@ -1,0 +1,71 @@
+{
+  "name": "telegram-group-moderator-bot",
+  "version": "1.0.0",
+  "description": "Telegram group moderator bot for protecting the group from scams",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fernnetwork/telegram-group-moderator-bot"
+  },
+  "author": "Jimmy Chen",
+  "scripts": {
+    "start": "export AWS_REGION=eu-west-1 && ./node_modules/.bin/serverless offline --noAuth -s dev",
+    "debug": "export SLS_DEBUG=* && export AWS_REGION=eu-west-1 && node --inspect ./node_modules/.bin/serverless offline --noAuth -s dev",
+    "test": "jest",
+    "test:ci": "jest --ci --runInBand --coverage",
+    "lint": "eslint .",
+    "lint:ci": "eslint . --format junit -o reports/junit/eslint-results.xml",
+    "make-coverage-badge": "make-coverage-badge",
+    "deploy": "sls deploy"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.30.0",
+    "url-regex": "^4.1.1"
+  },
+  "devDependencies": {
+    "@appliedblockchain/eslint-config": "^2.2.0",
+    "eslint": "^4.19.1",
+    "jest": "^23.1.0",
+    "jest-html-reporter": "^2.4.2",
+    "jest-junit": "^5.0.0",
+    "make-coverage-badge": "^1.0.1",
+    "serverless": "^1.27.3",
+    "serverless-offline": "^3.25.4"
+  },
+  "eslintConfig": {
+    "extends": "@appliedblockchain/eslint-config/node"
+  },
+  "eslintIgnore": [
+    "reports/*",
+    "coverage/*"
+  ],
+  "jest": {
+    "coverageReporters": [
+      "json-summary",
+      "lcov"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "reporters": [
+      [
+        "jest-junit",
+        {
+          "output": "reports/junit/junit.xml"
+        }
+      ],
+      [
+        "jest-html-reporter",
+        {
+          "outputPath": "reports/junit/index.html"
+        }
+      ]
+    ]
+  },
+  "jest-html-reporter": {
+    "outputPath": "reports/junit/index.html"
+  },
+  "jest-junit": {
+    "output": "reports/junit/junit.xml"
+  }
+}
