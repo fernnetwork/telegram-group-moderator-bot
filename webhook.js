@@ -26,16 +26,16 @@ const handler = async (event) => {
     const { from, chat } = message
 
     try {
-      const member = `${from.first_name} ${from.last_name}`
       const opts = { disabledChecks }
       const errorMsg = checkContents(message, opts)
 
       if (errorMsg) {
-        console.log(`Deleted message ${message.text || ''} from ${from.username} ${member}: ${errorMsg}.`)
+        const fullname = `${from.first_name} ${from.last_name}`
+        console.log(`Deleted message from user:\n  Username: ${from.username}\n  Full name: ${fullname}\n  Reason: ${errorMsg}\n  Message: ${message.text || ''}`)
         await bot.deleteMessage(chat.id, message.message_id)
       }
     } catch (error) {
-      console.error(`Error processing message: ${JSON.stringify(message)}`, error)
+      console.error(`Error processing message: ${JSON.stringify(message)}\n`, error.stack)
     }
   }
 
