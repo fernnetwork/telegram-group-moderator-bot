@@ -20,7 +20,8 @@ const handler = async (event) => {
     }
   }
 
-  const { message } = JSON.parse(event.body)
+  const body = JSON.parse(event.body)
+  const message = body.message || body.edited_message
 
   if (message && !whitelistedUserIds.includes(message.from.username)) {
     const { from, chat } = message
